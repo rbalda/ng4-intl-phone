@@ -1,10 +1,14 @@
-import {Component, ElementRef, forwardRef, HostListener, Input, OnInit, Renderer2} from '@angular/core';
+import {Component, ElementRef, forwardRef, HostListener, Input, OnInit, Renderer2, OnDestroy, Optional, Self, ViewChild} from '@angular/core';
 import {Country} from '../../interface/country.interface';
-import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
+import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormGroup, FormBuilder, NgControl} from '@angular/forms';
 import {CountryCode} from '../../interface/country-code.interface';
 import {CountryService} from '../../service/country.service';
 import {LocaleService} from '../../service/locale.service';
+import {MatFormFieldControl} from '@angular/material';
+import {coerceBooleanProperty} from '@angular/cdk/coercion';
 import * as _ from 'lodash';
+import { Subject } from 'rxjs/Subject';
+import {FocusMonitor} from '@angular/cdk/a11y';
 
 const COUNTER_CONTROL_ACCESSOR = {
     provide: NG_VALUE_ACCESSOR,
@@ -13,6 +17,7 @@ const COUNTER_CONTROL_ACCESSOR = {
 };
 
 const PLUS = '+';
+
 
 @Component({
     moduleId: module.id,
@@ -27,8 +32,8 @@ const PLUS = '+';
     },
     providers: [COUNTER_CONTROL_ACCESSOR, CountryService, LocaleService]
 })
-export class IntPhonePrefixComponent implements OnInit, ControlValueAccessor {
 
+export class IntPhonePrefixComponent implements OnInit, ControlValueAccessor {
     @Input()
     locale: string;
 
@@ -41,13 +46,18 @@ export class IntPhonePrefixComponent implements OnInit, ControlValueAccessor {
     @Input()
     onlyNumbers = true;
 
+    @Input()
+    placeholder = "Enter phone number"
+
+    @Input()
+    placeholderCountry = "Country"
+
+    
     // ELEMENT REF
     phoneComponent: ElementRef;
-
     // CONTROL VALUE ACCESSOR FUNCTIONS
     onTouch: Function;
     onModelChange: Function;
-
     countries: Country[];
     locales: CountryCode;
     selectedCountry: Country;
@@ -55,9 +65,8 @@ export class IntPhonePrefixComponent implements OnInit, ControlValueAccessor {
     showDropdown = false;
     phoneInput = '';
     disabled = false;
-
     value = '';
-
+    selected=''
     // FILTER COUNTRIES LIST WHEN DROPDOWN IS OPEN
     @HostListener('document:keypress', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent) {
@@ -70,10 +79,18 @@ export class IntPhonePrefixComponent implements OnInit, ControlValueAccessor {
         this.phoneComponent = phoneComponent;
     }
 
+    openSelect(event:any){
+        this.showDropdown = event;
+    }
+
     ngOnInit(): void {
         this.countries = this.service.getCountries();
         this.locales = this.localeService.getLocales(this.locale);
+    
         this.translateCountryNames();
+        if(this.defaultCountry){
+            this.selected = this.defaultCountry
+        }
     }
 
     setDisabledState(isDisabled: boolean): void {
@@ -91,7 +108,7 @@ export class IntPhonePrefixComponent implements OnInit, ControlValueAccessor {
     writeValue(value: string) {
         this.value = value || '';
         this.phoneInput = this.value;
-
+        
         if (IntPhonePrefixComponent.startsWithPlus(this.value)) {
             this.findPrefix(this.value.split(PLUS)[1]);
             if (this.selectedCountry) {
@@ -107,7 +124,6 @@ export class IntPhonePrefixComponent implements OnInit, ControlValueAccessor {
     updateSelectedCountry(event: Event, countryCode: string) {
         event.preventDefault();
         this.updatePhoneInput(countryCode);
-
         this.updateValue();
     }
 
@@ -128,7 +144,6 @@ export class IntPhonePrefixComponent implements OnInit, ControlValueAccessor {
         } else {
             this.selectedCountry = null;
         }
-
         this.updateValue();
     }
 
@@ -136,7 +151,6 @@ export class IntPhonePrefixComponent implements OnInit, ControlValueAccessor {
         this.countries.forEach((country: Country) => {
             country.name = this.locales[country.countryCode];
         });
-
         this.orderCountriesByName();
     }
 
@@ -146,11 +160,9 @@ export class IntPhonePrefixComponent implements OnInit, ControlValueAccessor {
 
     private updatePhoneInput(countryCode: string) {
         this.showDropdown = false;
-
         let newInputValue: string = IntPhonePrefixComponent.startsWithPlus(this.phoneInput)
             ? `${this.phoneInput.split(PLUS)[1].substr(this.selectedCountry.dialCode.length, this.phoneInput.length)}`
             : this.phoneInput;
-
         this.selectedCountry = this.countries.find((country: Country) => country.countryCode === countryCode);
         this.phoneInput = `${PLUS}${this.selectedCountry.dialCode} ${newInputValue.replace(/ /g, '')}`;
     }

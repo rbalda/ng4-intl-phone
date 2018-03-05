@@ -6,6 +6,9 @@ import {OnlyNumberDirective} from "./directive/only-number.directive";
 import {CountryPipe} from "./pipe/country.pipe";
 import {CountryService} from "./service/country.service";
 import {LocaleService} from "./service/locale.service";
+import { MatInputModule, MatIconModule, MatSelectModule } from "@angular/material";
+import {FocusMonitor} from '@angular/cdk/a11y';
+
 
 
 
@@ -13,7 +16,10 @@ import {LocaleService} from "./service/locale.service";
   imports: [
     CommonModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatInputModule,
+    MatIconModule,
+    MatSelectModule,
   ],
   declarations: [
     IntPhonePrefixComponent,
@@ -23,6 +29,6 @@ import {LocaleService} from "./service/locale.service";
   exports: [
     IntPhonePrefixComponent
   ],
-  providers: [CountryService, LocaleService]
+  providers: [CountryService, LocaleService, FocusMonitor]
 })
 export class InternationalPhoneModule {}

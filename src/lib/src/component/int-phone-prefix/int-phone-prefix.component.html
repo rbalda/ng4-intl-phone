@@ -1,4 +1,4 @@
-<div class="input-group">
+<!-- <div class="input-group">
       <span class="input-group-addon flagInput">
          <div class="dropdown">
             <button type="button" class="dropbtn btn" (click)="showDropDown()" [disabled]="disabled">
@@ -23,5 +23,24 @@
          [disabled]="disabled"
          [(ngModel)]="phoneInput"
          (ngModelChange)="updatePhone()">
-</div>
+</div> -->
+<mat-form-field>
+    <mat-select [placeholder]="placeholderCountry" [(ngModel)]='selected' (openedChange)="openSelect($event)"  >
+        <mat-option *ngFor="let country of countries | country: countryFilter" [attr.selected]='country.countryCode == defaultCountry ' 
+        [value]='country.countryCode' (click)="updateSelectedCountry($event, country.countryCode)">
+            <span [class]="'flag flag-' + country.countryCode"></span>
+            <span class="country-name">{{ country.name }}  <span
+              class="dial-code">+ {{ country.dialCode}}</span></span>
+        </mat-option>
+      </mat-select>
+</mat-form-field>
+<mat-form-field class="example-full-width">
+    <input matInput [onlyNumber]="onlyNumbers"
+    [maxlength]="maxLength"
+    [disabled]="disabled"
+    [(ngModel)]="phoneInput"
+    (ngModelChange)="updatePhone()"
+    [placeholder]="placeholder">
+    <mat-icon matSuffix>phone</mat-icon>
+</mat-form-field>
 

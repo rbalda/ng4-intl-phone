@@ -5,35 +5,13 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 @Component({
     selector: 'demo-app',
     template: `
-<div class="row mc">
-<div class="card">
-    <div class="row">
-        <div class="col-md-6">
-            <int-phone-prefix [(ngModel)]="phoneValue"
-                              [maxLength]="30"></int-phone-prefix>
-        </div>
-        <div class="col-md-6">
-            <span>The phone number is: {{phoneValue}}</span>
-        </div>
+    <div>
+        <int-phone-prefix [(ngModel)]="phoneValue"
+		[locale]="'es'"
+		[defaultCountry]="'ec'"
+            [maxLength]="30"
+            [placeholder]="'telefono'"></int-phone-prefix>
     </div>
-    <form [formGroup]="myForm" (ngSubmit)="logForm(myForm.value)" novalidate>
-        <div class="row mt">
-            <div class="col-md-10">
-                <int-phone-prefix [locale]="'es'"
-                    formControlName="myPhone"></int-phone-prefix>
-            </div>
-            <div class="col-md-2">
-               <button class="btn btn-primary">Submit</button>
-            </div>
-        </div>
-        <div class="row mt">
-            <div class="col-md-10">
-                <int-phone-prefix [locale]="'es'"
-                    formControlName="disabledPhone"></int-phone-prefix>
-            </div>
-        </div>
-    </form>
-</div>
   `,
 })
 export class AppComponent implements OnInit {
